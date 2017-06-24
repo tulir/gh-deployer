@@ -1,0 +1,45 @@
+// gh-deployer - A simple server that listens for changes on GitHub and deploys projects.
+// Copyright (C) 2017 Tulir Asokan
+
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+package main
+
+import (
+	"fmt"
+
+	"github.com/phayes/hookserve/hookserve"
+	"gopkg.in/src-d/go-git.v4"
+)
+
+func startServer() {
+	server := hookserve.NewServer()
+	server.Port = config.Port
+	server.Secret = config.Secret
+	server.GoListenAndServe()
+
+	git.PlainOpen("path")
+	for event := range server.Events {
+		if event.Action == "create" {
+			r, _ := git.PlainClone(config.GetPath(event.Repo, event.Owner, event.Branch), false, &git.CloneOptions{
+				URL: fmt.Sprintf("https://github.com/%s/%s.git", event.Owner, event.Repo),
+			})
+			w, _ := r.Worktree()
+			w.Status()
+		} else if event.Action == "push" {
+
+		}
+		fmt.Println(event.Owner + " " + event.Repo + " " + event.Branch + " " + event.Commit)
+	}
+}

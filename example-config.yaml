@@ -1,0 +1,7 @@
+port: 8008
+secret: GitHubWebhookVerificationSecret
+# Available variables:
+#   $REPO_NAME:  Name of repository.
+#   $REPO_OWNER: The owner of the repository.
+#   $BRANCH:     The name of the branch.
+pull-directory: /srv/$REPO_NAME/$BRANCH
