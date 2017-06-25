@@ -18,37 +18,24 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
-	"strings"
 
-	yaml "gopkg.in/yaml.v2"
+	git "gopkg.in/src-d/go-git.v4"
+	"gopkg.in/src-d/go-git.v4/plumbing"
 )
 
-// Config is the main global config struct.
-type Config struct {
-	Port          int    `yaml:"port"`
-	Secret        string `yaml:"secret"`
-	PullDirectory string `yaml:"pull-directory"`
+func clone(owner, repo, branch string) {
+	git.PlainClone(config.GetPath(owner, repo, branch), false, &git.CloneOptions{
+		URL:           fmt.Sprintf("https://github.com/%s/%s.git", owner, repo),
+		ReferenceName: plumbing.ReferenceName(fmt.Sprintf("refs/head/%s", branch)),
+	})
 }
 
-// GetPath gets the path to a pull directory
-func (config Config) GetPath(owner, repo, branch string) (str string) {
-	str = strings.Replace(config.PullDirectory, "$REPO_NAME", repo, -1)
-	str = strings.Replace(str, "$REPO_OWNER", owner, -1)
-	str = strings.Replace(str, "$BRANCH", branch, -1)
-	return
+func remove(owner, repo, branch string) {
+	os.RemoveAll(config.GetPath(owner, repo, branch))
 }
 
-func openConfig() {
-	data, err := ioutil.ReadFile(*configPath)
-	if err != nil {
-		fmt.Println("Failed to read config:", err)
-		os.Exit(2)
-	}
-	err = yaml.Unmarshal(data, &config)
-	if err != nil {
-		fmt.Println("Failed to parse config:", err)
-		os.Exit(3)
-	}
+func pull(owner, repo, branch string) {
+	r, _ := git.PlainOpen(config.GetPath(owner, repo, branch))
+	r.Pull(&git.PullOptions{})
 }

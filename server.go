@@ -17,8 +17,6 @@
 package main
 
 import (
-	"fmt"
-
 	"github.com/phayes/hookserve/hookserve"
 	"gopkg.in/src-d/go-git.v4"
 )
@@ -32,14 +30,10 @@ func startServer() {
 	git.PlainOpen("path")
 	for event := range server.Events {
 		if event.Action == "create" {
-			r, _ := git.PlainClone(config.GetPath(event.Repo, event.Owner, event.Branch), false, &git.CloneOptions{
-				URL: fmt.Sprintf("https://github.com/%s/%s.git", event.Owner, event.Repo),
-			})
-			w, _ := r.Worktree()
-			w.Status()
+			clone(event.Owner, event.Repo, event.Branch)
 		} else if event.Action == "push" {
-
+			pull(event.Owner, event.Repo, event.Branch)
+			run(event.Owner, event.Repo, event.Branch)
 		}
-		fmt.Println(event.Owner + " " + event.Repo + " " + event.Branch + " " + event.Commit)
 	}
 }
