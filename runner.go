@@ -27,6 +27,7 @@ import (
 	"strings"
 
 	"gopkg.in/yaml.v2"
+	log "maunium.net/go/maulogger"
 )
 
 // RunnerConfig contains the branch-specific deployment instructions.
@@ -39,18 +40,18 @@ type RunnerConfig struct {
 }
 
 func run(owner, repo, branch string) {
-	fmt.Printf("Preparing to deploy %s/%s branch %s\n", owner, repo, branch)
+	log.Debugln("Preparing to deploy %s/%s branch %s\n", owner, repo, branch)
 	dir := config.GetPath(owner, repo, branch)
 	dat, err := ioutil.ReadFile(filepath.Join(dir, ".gh-deployer.yaml"))
 	if err != nil {
-		fmt.Printf("Failed to read deployer run config of %s/%s branch %s: %s\n", owner, repo, branch, err)
+		log.Errorln("Failed to read deployer run config of %s/%s branch %s: %s\n", owner, repo, branch, err)
 		return
 	}
 
 	runConfig := RunnerConfig{}
 	err = yaml.Unmarshal(dat, &runConfig)
 	if err != nil {
-		fmt.Printf("Failed to parse deployer run config of %s/%s branch %s: %s\n", owner, repo, branch, err)
+		log.Errorln("Failed to parse deployer run config of %s/%s branch %s: %s\n", owner, repo, branch, err)
 		return
 	}
 	runConfig.Directory = dir

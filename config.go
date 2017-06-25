@@ -17,12 +17,13 @@
 package main
 
 import (
-	"fmt"
 	"io/ioutil"
 	"os"
 	"strings"
 
 	yaml "gopkg.in/yaml.v2"
+
+	log "maunium.net/go/maulogger"
 )
 
 // Config is the main global config struct.
@@ -42,14 +43,15 @@ func (config Config) GetPath(owner, repo, branch string) (str string) {
 }
 
 func openConfig() {
+	log.Debugln("Opening config from", *configPath)
 	data, err := ioutil.ReadFile(*configPath)
 	if err != nil {
-		fmt.Println("Failed to read config:", err)
+		log.Fatalln("Failed to read config:", err)
 		os.Exit(2)
 	}
 	err = yaml.Unmarshal(data, &config)
 	if err != nil {
-		fmt.Println("Failed to parse config:", err)
+		log.Fatalln("Failed to parse config:", err)
 		os.Exit(3)
 	}
 }

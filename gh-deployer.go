@@ -19,11 +19,15 @@ package main
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 
 	flag "maunium.net/go/mauflag"
+	log "maunium.net/go/maulogger"
 )
 
 var configPath = flag.MakeFull("c", "config", "The path to the config file.", "/etc/gh-deployer/config.yaml").String()
+var logPath = flag.MakeFull("l", "logs", "The directory to store logs in.", "/var/log/gh-deployer").String()
+var debug = flag.MakeFull("d", "debug", "Print debug messages to stdout", "false").Bool()
 var wantHelp, _ = flag.MakeHelpFlag()
 var config = Config{}
 
@@ -40,6 +44,13 @@ func main() {
 		fmt.Println(err)
 		flag.PrintHelp()
 		os.Exit(1)
+	}
+	if *debug {
+		log.DefaultLogger.PrintLevel = log.LevelDebug.Severity
+	}
+	log.DefaultLogger.FileMode = 0444
+	log.DefaultLogger.FileFormat = func(now string, i int) string {
+		return filepath.Join(*logPath, fmt.Sprintf("%s-%02d.log", now, i))
 	}
 
 	openConfig()

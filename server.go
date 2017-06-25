@@ -17,27 +17,22 @@
 package main
 
 import (
-	"fmt"
-
 	"github.com/phayes/hookserve/hookserve"
-	"gopkg.in/src-d/go-git.v4"
+	log "maunium.net/go/maulogger"
 )
 
 func startServer() {
+	log.Debugln("Initializing webhook receiver...")
 	server := hookserve.NewServer()
 	server.Port = config.Port
 	server.Secret = config.Secret
 	server.Path = config.Path
 	server.GoListenAndServe()
 
-	git.PlainOpen("path")
+	log.Debugf("Listening for webhooks on IP:%d%s\n", server.Port, server.Path)
 	for event := range server.Events {
-		fmt.Println(event.String())
-		//if event.Action == "create" {
-		//	clone(event.Owner, event.Repo, event.Branch)
-		//} else if event.Action == "push" {
+		log.Debugf("Received %s event from %s/%s branch %s", event.Type, event.Owner, event.Repo, event.Branch)
 		pull(event.Owner, event.Repo, event.Branch)
 		run(event.Owner, event.Repo, event.Branch)
-		//}
 	}
 }

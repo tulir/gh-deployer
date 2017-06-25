@@ -22,16 +22,17 @@ import (
 
 	git "gopkg.in/src-d/go-git.v4"
 	"gopkg.in/src-d/go-git.v4/plumbing"
+	log "maunium.net/go/maulogger"
 )
 
 func clone(owner, repo, branch string) {
-	fmt.Printf("Cloning %s/%s branch %s\n", owner, repo, branch)
+	log.Debugf("Cloning %s/%s branch %s\n", owner, repo, branch)
 	r, err := git.PlainClone(config.GetPath(owner, repo, branch), false, &git.CloneOptions{
 		URL:           fmt.Sprintf("https://github.com/%s/%s.git", owner, repo),
 		ReferenceName: plumbing.ReferenceName(fmt.Sprintf("refs/heads/%s", branch)),
 	})
 	if err != nil {
-		fmt.Println("Failed to clone:", err)
+		log.Debugf("Failed to clone %s/%s branch %s: %s\n", owner, repo, branch, err)
 		return
 	}
 	r.Pull(&git.PullOptions{})
@@ -39,25 +40,29 @@ func clone(owner, repo, branch string) {
 
 func remove(owner, repo, branch string) {
 	path := config.GetPath(owner, repo, branch)
-	fmt.Println("Removing", path)
+	log.Debugln("Removing", path)
 	err := os.RemoveAll(path)
 	if err != nil {
-		fmt.Println("Failed to remove:", err)
+		log.Debugf("Failed to remove repo at %s: %s\n", path, err)
 	}
 }
 
 func pull(owner, repo, branch string) {
-	fmt.Printf("Pulling %s/%s branch %s\n", owner, repo, branch)
+	log.Debugln("Pulling %s/%s branch %s\n", owner, repo, branch)
 	path := config.GetPath(owner, repo, branch)
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		os.MkdirAll(path, 0755)
 	}
 	r, err := git.PlainOpen(path)
 	if err != nil {
-		fmt.Println("Failed to open repo at", path)
+		// Shouldn't be a critical error, just debug
+		log.Debugf("Failed to open repo at %s: %s\n", path, err)
 		remove(owner, repo, branch)
 		clone(owner, repo, branch)
 		return
 	}
-	r.Pull(&git.PullOptions{})
+	err = r.Pull(&git.PullOptions{})
+	if err != nil {
+		log.Errorf("Failed to pull repo at %s: %s\n", path, err)
+	}
 }
