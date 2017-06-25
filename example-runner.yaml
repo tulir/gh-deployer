@@ -1,0 +1,16 @@
+# The shell to run the commands in. Optional
+shell: /bin/bash
+shell-args: [ "-c" ]
+
+# Environment variables to set for the commands
+# The environment where gh-deployer is run is available
+# Also, the following variables are set by the gh-deployer itself:
+#   HEAD: The hash of the Git HEAD (git rev-parse HEAD)
+#
+env:
+- PROJECT_NAME=gh-deployer
+
+# The actual commands to run
+commands:
+- go build -o $PROJECT_NAME
+- cp $PROJECT_NAME /var/www/html/downloads/$HEAD
