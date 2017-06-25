@@ -1,6 +1,6 @@
 # The path to listen for GitHub POSTs on
 path: /
-port: 8008
+port: 29310
 secret: GitHubWebhookVerificationSecret
 # Available variables:
 #   $REPO_NAME:  Name of repository.
