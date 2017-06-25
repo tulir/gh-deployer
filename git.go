@@ -25,17 +25,39 @@ import (
 )
 
 func clone(owner, repo, branch string) {
-	git.PlainClone(config.GetPath(owner, repo, branch), false, &git.CloneOptions{
+	fmt.Printf("Cloning %s/%s branch %s\n", owner, repo, branch)
+	r, err := git.PlainClone(config.GetPath(owner, repo, branch), false, &git.CloneOptions{
 		URL:           fmt.Sprintf("https://github.com/%s/%s.git", owner, repo),
-		ReferenceName: plumbing.ReferenceName(fmt.Sprintf("refs/head/%s", branch)),
+		ReferenceName: plumbing.ReferenceName(fmt.Sprintf("refs/heads/%s", branch)),
 	})
+	if err != nil {
+		fmt.Println("Failed to clone:", err)
+		return
+	}
+	r.Pull(&git.PullOptions{})
 }
 
 func remove(owner, repo, branch string) {
-	os.RemoveAll(config.GetPath(owner, repo, branch))
+	path := config.GetPath(owner, repo, branch)
+	fmt.Println("Removing", path)
+	err := os.RemoveAll(path)
+	if err != nil {
+		fmt.Println("Failed to remove:", err)
+	}
 }
 
 func pull(owner, repo, branch string) {
-	r, _ := git.PlainOpen(config.GetPath(owner, repo, branch))
+	fmt.Printf("Pulling %s/%s branch %s\n", owner, repo, branch)
+	path := config.GetPath(owner, repo, branch)
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		os.MkdirAll(path, 0755)
+	}
+	r, err := git.PlainOpen(path)
+	if err != nil {
+		fmt.Println("Failed to open repo at", path)
+		remove(owner, repo, branch)
+		clone(owner, repo, branch)
+		return
+	}
 	r.Pull(&git.PullOptions{})
 }

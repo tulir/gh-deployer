@@ -39,6 +39,7 @@ type RunnerConfig struct {
 }
 
 func run(owner, repo, branch string) {
+	fmt.Printf("Preparing to deploy %s/%s branch %s\n", owner, repo, branch)
 	dir := config.GetPath(owner, repo, branch)
 	dat, err := ioutil.ReadFile(filepath.Join(dir, ".gh-deployer.yaml"))
 	if err != nil {
