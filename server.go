@@ -29,7 +29,7 @@ func startServer() {
 	server.Path = config.Path
 	server.GoListenAndServe()
 
-	log.Debugf("Listening for webhooks on IP:%d%s\n", server.Port, server.Path)
+	log.Infoln("Listening for webhooks on IP:%d%s\n", server.Port, server.Path)
 	for event := range server.Events {
 		log.Debugf("Received %s event from %s/%s branch %s", event.Type, event.Owner, event.Repo, event.Branch)
 		pull(event.Owner, event.Repo, event.Branch)
