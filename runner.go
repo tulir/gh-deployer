@@ -26,6 +26,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	git "gopkg.in/src-d/go-git.v4"
 	"gopkg.in/yaml.v2"
 	log "maunium.net/go/maulogger"
 )
@@ -64,6 +65,11 @@ func (rconf RunnerConfig) run() {
 	stdoutWriter := bufio.NewWriter(stdoutFile)
 	stderrWriter := bufio.NewWriter(stderrFile)
 	infoMessages := io.MultiWriter(stdoutWriter, stderrWriter)
+
+	r, _ := git.PlainOpen(rconf.Directory)
+	ref, _ := r.Head()
+	rconf.Environment = append(rconf.Environment, fmt.Sprintf("HEAD=%s", ref.Hash()))
+
 	fmt.Fprintln(infoMessages, "[gh-deployer] Deploying project...")
 
 	for _, rawCommand := range rconf.Commands {
