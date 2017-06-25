@@ -25,6 +25,7 @@ func startServer() {
 	server := hookserve.NewServer()
 	server.Port = config.Port
 	server.Secret = config.Secret
+	server.Path = config.Path
 	server.GoListenAndServe()
 
 	git.PlainOpen("path")

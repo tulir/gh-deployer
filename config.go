@@ -28,6 +28,7 @@ import (
 // Config is the main global config struct.
 type Config struct {
 	Port          int    `yaml:"port"`
+	Path          string `yaml:"path"`
 	Secret        string `yaml:"secret"`
 	PullDirectory string `yaml:"pull-directory"`
 }

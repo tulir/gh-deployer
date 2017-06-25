@@ -62,6 +62,7 @@ func (rconf RunnerConfig) run() {
 	stdoutWriter := bufio.NewWriter(stdoutFile)
 	stderrWriter := bufio.NewWriter(stderrFile)
 	infoMessages := io.MultiWriter(stdoutWriter, stderrWriter)
+	fmt.Fprintln(infoMessages, "[gh-deployer] Deploying project...")
 
 	for _, rawCommand := range rconf.Commands {
 		var command string
