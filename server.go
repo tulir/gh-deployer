@@ -17,22 +17,29 @@
 package main
 
 import (
-	"github.com/phayes/hookserve/hookserve"
+	"maunium.net/go/githuuk"
 	log "maunium.net/go/maulogger"
 )
 
 func startServer() {
 	log.Debugln("Initializing webhook receiver...")
-	server := hookserve.NewServer()
+	server := githuuk.NewServer()
+	server.Host = config.Host
 	server.Port = config.Port
 	server.Secret = config.Secret
 	server.Path = config.Path
-	server.GoListenAndServe()
+	server.AsyncListenAndServe()
 
-	log.Infof("Listening for webhooks on IP:%d%s\n", server.Port, server.Path)
-	for event := range server.Events {
-		log.Debugf("Received %s event from %s/%s branch %s", event.Type, event.Owner, event.Repo, event.Branch)
-		pull(event.Owner, event.Repo, event.Branch)
-		run(event.Owner, event.Repo, event.Branch)
+	log.Infof("Listening for webhooks on %s:%d%s\n", server.Host, server.Port, server.Path)
+	for rawEvent := range server.Events {
+		switch evt := rawEvent.(type) {
+		case *githuuk.PushEvent:
+			log.Debugf("%s pushed to %s branch %s\n", evt.Sender.Login, evt.Repository.FullName, evt.Ref.Name())
+			pull(evt.Repository.Owner.Login, evt.Repository.Name, evt.Ref.Name())
+			run(evt.Repository.Owner.Login, evt.Repository.Name, evt.Ref.Name())
+		case *githuuk.DeleteEvent:
+			log.Debugf("%s deleted branch %s of %s", evt.Sender.Login, evt.Ref.Name(), evt.Repository.FullName)
+			remove(evt.Repository.Owner.Login, evt.Repository.Name, evt.Ref.Name())
+		}
 	}
 }

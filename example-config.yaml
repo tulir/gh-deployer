@@ -1,7 +1,12 @@
 # The path to listen for GitHub POSTs on
 path: /
+# The IP to bind (optional)
+host: 127.0.0.1
+# The port to bind
 port: 29310
+# The GitHub webhook secret used to verify that calls are really coming from GitHub.
 secret: GitHubWebhookVerificationSecret
+# The directory where branches should be pulled.
 # Available variables:
 #   $REPO_NAME:  Name of repository.
 #   $REPO_OWNER: The owner of the repository.
