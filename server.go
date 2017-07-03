@@ -34,9 +34,11 @@ func startServer() {
 	for rawEvent := range server.Events {
 		switch evt := rawEvent.(type) {
 		case *githuuk.PushEvent:
-			log.Debugf("%s pushed to %s branch %s\n", evt.Sender.Login, evt.Repository.FullName, evt.Ref.Name())
-			pull(evt.Repository.Owner.Login, evt.Repository.Name, evt.Ref.Name())
-			run(evt.Repository.Owner.Login, evt.Repository.Name, evt.Ref.Name())
+			if !evt.Deleted {
+				log.Debugf("%s pushed to %s branch %s\n", evt.Sender.Login, evt.Repository.FullName, evt.Ref.Name())
+				pull(evt.Repository.Owner.Login, evt.Repository.Name, evt.Ref.Name())
+				run(evt.Repository.Owner.Login, evt.Repository.Name, evt.Ref.Name())
+			}
 		case *githuuk.DeleteEvent:
 			log.Debugf("%s deleted branch %s of %s\n", evt.Sender.Login, evt.Ref.Name(), evt.Repository.FullName)
 			remove(evt.Repository.Owner.Login, evt.Repository.Name, evt.Ref.Name())
