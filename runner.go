@@ -57,6 +57,7 @@ func run(owner, repo, branch string) {
 	}
 	runConfig.Directory = dir
 	runConfig.run()
+	log.Debugf("Deployment of %s/%s branch %s completed.\n", owner, repo, branch)
 }
 
 func (rconf RunnerConfig) run() {
