@@ -50,7 +50,7 @@ func remove(owner, repo, branch string) {
 }
 
 func pull(owner, repo, branch string) {
-	log.Debugln("Pulling %s/%s branch %s\n", owner, repo, branch)
+	log.Debugf("Pulling %s/%s branch %s\n", owner, repo, branch)
 	path := config.GetPath(owner, repo, branch)
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		os.MkdirAll(path, 0755)

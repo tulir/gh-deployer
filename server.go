@@ -38,7 +38,7 @@ func startServer() {
 			pull(evt.Repository.Owner.Login, evt.Repository.Name, evt.Ref.Name())
 			run(evt.Repository.Owner.Login, evt.Repository.Name, evt.Ref.Name())
 		case *githuuk.DeleteEvent:
-			log.Debugf("%s deleted branch %s of %s", evt.Sender.Login, evt.Ref.Name(), evt.Repository.FullName)
+			log.Debugf("%s deleted branch %s of %s\n", evt.Sender.Login, evt.Ref.Name(), evt.Repository.FullName)
 			remove(evt.Repository.Owner.Login, evt.Repository.Name, evt.Ref.Name())
 		}
 	}

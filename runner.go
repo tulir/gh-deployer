@@ -56,7 +56,7 @@ func run(owner, repo, branch string) {
 		return
 	}
 	runConfig.Directory = dir
-	go runConfig.run()
+	runConfig.run()
 }
 
 func (rconf RunnerConfig) run() {
