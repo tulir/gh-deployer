@@ -41,18 +41,18 @@ type RunnerConfig struct {
 }
 
 func run(owner, repo, branch string) {
-	log.Debugln("Preparing to deploy %s/%s branch %s\n", owner, repo, branch)
+	log.Debugf("Preparing to deploy %s/%s branch %s\n", owner, repo, branch)
 	dir := config.GetPath(owner, repo, branch)
 	dat, err := ioutil.ReadFile(filepath.Join(dir, ".gh-deployer.yaml"))
 	if err != nil {
-		log.Errorln("Failed to read deployer run config of %s/%s branch %s: %s\n", owner, repo, branch, err)
+		log.Errorf("Failed to read deployer run config of %s/%s branch %s: %s\n", owner, repo, branch, err)
 		return
 	}
 
 	runConfig := RunnerConfig{}
 	err = yaml.Unmarshal(dat, &runConfig)
 	if err != nil {
-		log.Errorln("Failed to parse deployer run config of %s/%s branch %s: %s\n", owner, repo, branch, err)
+		log.Errorf("Failed to parse deployer run config of %s/%s branch %s: %s\n", owner, repo, branch, err)
 		return
 	}
 	runConfig.Directory = dir
