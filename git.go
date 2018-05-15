@@ -35,7 +35,8 @@ func clone(owner, repo, branch string) {
 		log.Debugf("Failed to clone %s/%s branch %s: %s\n", owner, repo, branch, err)
 		return
 	}
-	r.Pull(&git.PullOptions{
+	w, _ := r.Worktree()
+	w.Pull(&git.PullOptions{
 		ReferenceName: plumbing.ReferenceName(fmt.Sprintf("refs/heads/%s", branch)),
 	})
 }
@@ -63,7 +64,8 @@ func pull(owner, repo, branch string) {
 		clone(owner, repo, branch)
 		return
 	}
-	err = r.Pull(&git.PullOptions{
+	w, _ := r.Worktree()
+	err = w.Pull(&git.PullOptions{
 		ReferenceName: plumbing.ReferenceName(fmt.Sprintf("refs/heads/%s", branch)),
 	})
 	if err != nil {
