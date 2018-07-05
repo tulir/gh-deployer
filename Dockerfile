@@ -1,6 +1,6 @@
 FROM golang:1-alpine AS builder
 
-RUN apk add --no-cache git
+RUN apk add --no-cache git ca-certificates
 RUN wget -qO /usr/local/bin/dep https://github.com/golang/dep/releases/download/v0.4.1/dep-linux-amd64
 RUN chmod +x /usr/local/bin/dep
 
@@ -15,5 +15,6 @@ RUN CGO_ENABLED=0 go build -o /usr/bin/gh-deployer
 FROM scratch
 
 COPY --from=builder /usr/bin/gh-deployer /usr/bin/gh-deployer
+COPY --from=builder /etc/ssl/certs/ /etc/ssl/certs
 
 CMD ["/usr/bin/gh-deployer"]
